@@ -142,7 +142,7 @@ document.addEventListener('DOMContentLoaded', () => {
         showBubble(bubbleB, dialoguesB[idxB], avatar2El);
         idxB = (idxB + 1) % dialoguesB.length;
       }, 30000);
-    }, 17500);
+    }, 17800);
   
     // initial show
     // cycleDialogues();
@@ -164,11 +164,12 @@ document.addEventListener('DOMContentLoaded', () => {
   // Configure hotspots here: x,y,w,h are pixels relative to #bookshop
   // image: path to book image, text: initial caption
   const hotspots = [
-    { id: 'obj2', x: 280, y: 250, w: 30, h: 30, image: 'images/book.png', text: "Dear diary, I miss my boyfriend." },
+    { id: 'obj2', x: 270, y: 250, w: 30, h: 30, image: 'images/book.png', text: "Dear diary, I miss my boyfriend." },
     { id: 'obj3', x: 260, y: 485, w: 30, h: 30, image: 'images/book.png', text: "Boston 2025 Scrapbook!" },
-    { id: 'obj4', x: 140, y: 170, w: 30, h: 30, image: 'images/book.png', text: "Boston 2025 Scrapbook!" },
+    { id: 'obj4', x: 140, y: 170, w: 30, h: 30},
     { id: 'obj5', x: 470, y: 260, w: 30, h: 30, image: 'images/book.png', text: "The Digital Divide in Education: Investigating the Effect of Poor Internet Connectivity on Post-COVID Educational Outcomes" },
-    { id: 'obj6', x: 340, y: 70, w: 10, h: 30, image: 'images/test_tube.png', text: "BOOM" }
+    { id: 'obj6', x: 340, y: 70, w: 10, h: 30, text: "BOOM" },
+    { id: 'obj7', x: 140, y: 510, w: 30, h: 30, text: "ZZZ" }
 ];
 
   hotspots.forEach(cfg => {
@@ -232,11 +233,102 @@ document.addEventListener('DOMContentLoaded', () => {
       if (cfg.id === 'obj4') {
         // open Wordle game (modal inserted in HTML)
         if (typeof openWordleGame === 'function') openWordleGame();
+      } else if (cfg.id === 'obj6') {
+        // boom sparkle animation: position inside #bookshop
+        const bx = cfg.x + (cfg.w || 0) / 2;
+        const by = cfg.y + (cfg.h || 0) / 2;
+        createBoomAnimation(bookshop, bx, by, cfg.text);
+      } else if (cfg.id === 'obj7') {
+        // dog sleeping: floating "zzzz" text
+        const bx = cfg.x + (cfg.w || 0) / 2;
+        const by = cfg.y + (cfg.h || 0) / 2;
+        createFloatingText(bookshop, bx, by, cfg.text || 'zzzz');
       } else {
         openObjectModal();
       }
     });
   });
+
+  // createBoomAnimation: append DOM sparkles/flash/text inside the given container
+  function createBoomAnimation(containerEl, x, y, label) {
+    // containerEl is the #bookshop element (position: relative)
+    const wrapperLeft = x;
+    const wrapperTop = y;
+
+    const sparkleContainer = document.createElement('div');
+    sparkleContainer.className = 'sparkle-container';
+    sparkleContainer.style.left = (wrapperLeft) + 'px';
+    sparkleContainer.style.top = (wrapperTop) + 'px';
+    containerEl.appendChild(sparkleContainer);
+
+    const flash = document.createElement('div');
+    flash.className = 'flash-overlay';
+    flash.style.left = (wrapperLeft - 100) + 'px';
+    flash.style.top = (wrapperTop - 100) + 'px';
+    flash.style.width = '200px';
+    flash.style.height = '200px';
+    containerEl.appendChild(flash);
+
+    const boomText = document.createElement('div');
+    boomText.className = 'boom-text';
+    boomText.textContent = label || 'BOOM!';
+    // center the text on the hotspot
+    boomText.style.left = wrapperLeft + 'px';
+    boomText.style.top = wrapperTop + 'px';
+    containerEl.appendChild(boomText);
+
+    const numSparkles = 20;
+    for (let i = 0; i < numSparkles; i++) {
+      const sparkle = document.createElement('div');
+      const angle = (Math.PI * 2 * i) / numSparkles;
+      const distance = 30 + Math.random() * 60;
+      const tx = Math.cos(angle) * distance;
+      const ty = Math.sin(angle) * distance;
+      sparkle.className = i % 3 === 0 ? 'sparkle star' : 'sparkle';
+      sparkle.style.setProperty('--tx', tx + 'px');
+      sparkle.style.setProperty('--ty', ty + 'px');
+      sparkle.style.animationDelay = (Math.random() * 0.15) + 's';
+      sparkleContainer.appendChild(sparkle);
+    }
+
+    // some extra random sparkles
+    for (let i = 0; i < 12; i++) {
+      const sparkle = document.createElement('div');
+      const angle = Math.random() * Math.PI * 2;
+      const distance = 20 + Math.random() * 80;
+      const tx = Math.cos(angle) * distance;
+      const ty = Math.sin(angle) * distance;
+      sparkle.className = 'sparkle';
+      sparkle.style.setProperty('--tx', tx + 'px');
+      sparkle.style.setProperty('--ty', ty + 'px');
+      sparkle.style.animationDelay = (Math.random() * 0.25) + 's';
+      sparkleContainer.appendChild(sparkle);
+    }
+
+    // cleanup
+    setTimeout(() => {
+      if (sparkleContainer && sparkleContainer.parentNode) sparkleContainer.parentNode.removeChild(sparkleContainer);
+      if (flash && flash.parentNode) flash.parentNode.removeChild(flash);
+      if (boomText && boomText.parentNode) boomText.parentNode.removeChild(boomText);
+    }, 1200);
+  }
+
+  // createFloatingText: shows a small floating 'zzzz' (or provided text) that drifts up and fades
+  function createFloatingText(containerEl, x, y, text) {
+    const floatEl = document.createElement('div');
+    floatEl.className = 'floating-text';
+    floatEl.textContent = text || 'zzzz';
+    // position relative to container
+    floatEl.style.left = x + 'px';
+    floatEl.style.top = y + 'px';
+    containerEl.appendChild(floatEl);
+
+    // remove after animation
+    const duration = 2000; // ms
+    setTimeout(() => {
+      if (floatEl && floatEl.parentNode) floatEl.parentNode.removeChild(floatEl);
+    }, duration + 200);
+  }
 });
 
 // Welcome modal behavior: require secret password to enter

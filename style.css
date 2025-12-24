@@ -350,3 +350,70 @@ body {
 #reset-wordle, #close-wordle { margin:6px; padding:10px 16px; border-radius:6px; border:none; cursor:pointer; font-family: 'Press Start 2P', monospace; }
 #reset-wordle { background:#2a7ae2; color:#fff; }
 #close-wordle { background:#e74c3c; color:#fff; }
+
+/* Boom / sparkle animation styles (for obj6) */
+.sparkle-container {
+    position: absolute;
+    pointer-events: none;
+    z-index: 2000;
+}
+.sparkle {
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    background: radial-gradient(circle, #ffeb3b 0%, #ff9800 50%, transparent 70%);
+    border-radius: 50%;
+    animation: sparkle-burst 0.8s ease-out forwards;
+    box-shadow: 0 0 10px #ffeb3b;
+}
+@keyframes sparkle-burst {
+    0% { transform: translate(0,0) scale(1); opacity: 1; }
+    100% { transform: translate(var(--tx), var(--ty)) scale(0); opacity: 0; }
+}
+.sparkle.star { width:0; height:0; background: none; box-shadow: none; }
+.sparkle.star::before, .sparkle.star::after { content: ''; position: absolute; background: #ffeb3b; box-shadow: 0 0 8px #ff9800; }
+.sparkle.star::before { width: 12px; height: 3px; left: -6px; top: -1.5px; }
+.sparkle.star::after { width: 3px; height: 12px; left: -1.5px; top: -6px; }
+.flash-overlay {
+    position: absolute;
+    pointer-events: none;
+    background: radial-gradient(circle, rgba(255,235,59,0.6) 0%, transparent 70%);
+    opacity: 0;
+    animation: flash 0.3s ease-out;
+    z-index: 1999;
+}
+@keyframes flash { 0%,100% { opacity:0 } 50% { opacity:1 } }
+.boom-text {
+    position: absolute;
+    font-size: 32px;
+    font-weight: bold;
+    color: #ff5722;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.5), 0 0 10px #ffeb3b, 0 0 20px #ff9800;
+    animation: boom-text 0.8s ease-out forwards;
+    pointer-events: none;
+    font-family: 'Press Start 2P', monospace;
+    letter-spacing: 2px;
+    z-index: 2001;
+}
+@keyframes boom-text {
+    0% { transform: translate(-50%,-50%) scale(0.3) rotate(-20deg); opacity:1 }
+    50% { transform: translate(-50%,-50%) scale(1.2) rotate(5deg) }
+    100% { transform: translate(-50%,-70%) scale(1) rotate(0deg); opacity:0 }
+}
+
+/* Floating sleep text for obj7 */
+.floating-text {
+    position: absolute;
+    transform: translate(-50%, -50%);
+    font-family: 'Press Start 2P', monospace;
+    color: #ffffff;
+    font-size: 14px;
+    pointer-events: none;
+    text-shadow: 0 1px 0 rgba(0,0,0,0.6);
+    animation: float-up 2s ease-out forwards;
+    z-index: 2002;
+}
+@keyframes float-up {
+    0% { transform: translate(-50%, -50%) translateY(0); opacity: 1; }
+    100% { transform: translate(-50%, -120%) translateY(-40px); opacity: 0; }
+}
