@@ -1,7 +1,3 @@
-// Update bubble text
-const bubble = document.getElementById('bubble1');
-if (bubble) bubble.textContent = "Reading: '1984'";
-
 // NPC movement: two avatars follow short adjustable routes and swap sprites when moving left/right
 // Configure NPCs here: adjust `route` arrays to limit where they walk.
 const npcConfigs = [
@@ -264,8 +260,12 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   enterBtn.addEventListener('click', () => {
-    // password check temporarily disabled for editing — accept immediately
-    accept();
+    const val = (passwordInput.value || '').trim();
+    if (val === SECRET_PASSWORD) {
+      accept();
+    } else {
+      showError('Incorrect password');
+    }
   });
 
   passwordInput.addEventListener('keydown', (e) => {
