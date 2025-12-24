@@ -98,11 +98,13 @@ document.addEventListener('DOMContentLoaded', () => {
   const dialoguesA = [
     "Lovely day for a read!",
     "Currently reading 'My Brilliant Friend'",
+    "Can't wait to start my DPhil!",
     "I recommend the mystery shelf."
   ];
 
   const dialoguesB = [
     "Quiet please — I've got a biography to read.",
+    "I'm definitely punching!",
     "This aisle has rare editions.",
     "Grab a tea and enjoy the book." 
   ];
@@ -163,8 +165,11 @@ document.addEventListener('DOMContentLoaded', () => {
   // image: path to book image, text: initial caption
   const hotspots = [
     { id: 'obj2', x: 280, y: 250, w: 30, h: 30, image: 'images/book.png', text: "Dear diary, I miss my boyfriend." },
-    { id: 'obj3', x: 260, y: 485, w: 30, h: 30, image: 'images/book.png', text: "Boston 2025 Scrapbook!" }
-  ];
+    { id: 'obj3', x: 260, y: 485, w: 30, h: 30, image: 'images/book.png', text: "Boston 2025 Scrapbook!" },
+    { id: 'obj4', x: 140, y: 170, w: 30, h: 30, image: 'images/book.png', text: "Boston 2025 Scrapbook!" },
+    { id: 'obj5', x: 470, y: 260, w: 30, h: 30, image: 'images/book.png', text: "The Digital Divide in Education: Investigating the Effect of Poor Internet Connectivity on Post-COVID Educational Outcomes" },
+    { id: 'obj6', x: 340, y: 70, w: 10, h: 30, image: 'images/test_tube.png', text: "BOOM" }
+];
 
   hotspots.forEach(cfg => {
     // create hotspot element
@@ -185,7 +190,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
       const inner = document.createElement('div');
       inner.className = 'modal-inner';
-
 
       const wrapper = document.createElement('div');
       wrapper.className = 'overlay';
@@ -225,7 +229,12 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     hs.addEventListener('click', () => {
-      openObjectModal();
+      if (cfg.id === 'obj4') {
+        // open Wordle game (modal inserted in HTML)
+        if (typeof openWordleGame === 'function') openWordleGame();
+      } else {
+        openObjectModal();
+      }
     });
   });
 });
@@ -260,16 +269,131 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   enterBtn.addEventListener('click', () => {
-    const val = (passwordInput.value || '').trim();
-    if (val === SECRET_PASSWORD) {
+    // const val = (passwordInput.value || '').trim();
+    // if (val === SECRET_PASSWORD) {
       accept();
-    } else {
-      showError('Incorrect password');
-    }
+    // } else {
+    //   showError('Incorrect password');
+    // }
   });
 
   passwordInput.addEventListener('keydown', (e) => {
     if (e.key === 'Enter') enterBtn.click();
   });
+});
+
+// Wordle game module: initializes the modal added to Website.html
+document.addEventListener('DOMContentLoaded', () => {
+  // keep Wordle state scoped inside this module
+  const modal = document.getElementById('wordle-modal');
+  const gridEl = document.getElementById('wordle-grid');
+  const keyboardEl = document.getElementById('wordle-keyboard');
+  const messageEl = document.getElementById('wordle-message');
+  const closeBtn = document.getElementById('close-wordle');
+  const resetBtn = document.getElementById('reset-wordle');
+
+  if (!modal || !gridEl || !keyboardEl || !messageEl || !closeBtn || !resetBtn) return;
+
+  const WORD_LIST = ['LOVEU','DREAM','HELLO','FLAME','HENRY','BITCH'];
+  let targetWord = '';
+  let currentRow = 0;
+  let currentGuess = '';
+  let gameOver = false;
+  const MAX_GUESSES = 6;
+  const keyStates = {};
+
+  const keyboard = [
+    ['Q','W','E','R','T','Y','U','I','O','P'],
+    ['A','S','D','F','G','H','J','K','L'],
+    ['ENTER','Z','X','C','V','B','N','M','BACK']
+  ];
+
+  function openWordleGame() {
+    modal.classList.remove('hidden');
+    modal.style.display = 'flex';
+    initGame();
+  }
+
+  function closeWordleGame() {
+    modal.classList.add('hidden');
+    modal.style.display = 'none';
+  }
+
+  function initGame() {
+    targetWord = WORD_LIST[Math.floor(Math.random() * WORD_LIST.length)];
+    currentRow = 0; currentGuess = ''; gameOver = false; messageEl.textContent = '';
+    Object.keys(keyStates).forEach(k => delete keyStates[k]);
+    createGrid(); createKeyboard();
+  }
+
+  function createGrid() {
+    gridEl.innerHTML = '';
+    for (let r=0;r<MAX_GUESSES;r++){
+      const row = document.createElement('div'); row.className='wordle-row';
+      for (let c=0;c<5;c++){ const tile = document.createElement('div'); tile.className='wordle-tile'; tile.id = `tile-${r}-${c}`; row.appendChild(tile); }
+      gridEl.appendChild(row);
+    }
+  }
+
+  function createKeyboard(){
+    keyboardEl.innerHTML = '';
+    keyboard.forEach(row=>{
+      const rowEl = document.createElement('div'); rowEl.className='keyboard-row';
+      row.forEach(k=>{
+        const kEl = document.createElement('button'); kEl.className='key'; kEl.textContent = k;
+        if (k==='ENTER' || k==='BACK') kEl.classList.add('wide');
+        if (keyStates[k]) kEl.classList.add(keyStates[k]);
+        kEl.addEventListener('click', ()=> handleKey(k));
+        rowEl.appendChild(kEl);
+      }); keyboardEl.appendChild(rowEl);
+    });
+  }
+
+  function handleKey(key){
+    if (gameOver) return;
+    if (key==='BACK'){
+      if (currentGuess.length>0){ currentGuess = currentGuess.slice(0,-1); updateCurrentRow(); }
+    } else if (key==='ENTER'){
+      if (currentGuess.length===5) submitGuess();
+    } else {
+      if (currentGuess.length<5){ currentGuess += key; updateCurrentRow(); }
+    }
+  }
+
+  function updateCurrentRow(){
+    for (let i=0;i<5;i++){ const tile = document.getElementById(`tile-${currentRow}-${i}`); tile.textContent = currentGuess[i]||''; tile.className = 'wordle-tile'+(currentGuess[i]?' filled':''); }
+  }
+
+  function submitGuess(){
+    const guess = currentGuess;
+    const result = checkGuess(guess);
+    for (let i=0;i<5;i++){ const tile = document.getElementById(`tile-${currentRow}-${i}`); setTimeout(()=>{ tile.classList.add(result[i]); }, i*120); }
+    updateKeyboard(guess,result);
+    if (guess === targetWord){ setTimeout(()=>{ messageEl.textContent = '🎉 You won! 🎉'; gameOver = true; }, 500); }
+    else if (currentRow === MAX_GUESSES-1){ setTimeout(()=>{ messageEl.textContent = `Game Over! Word was: ${targetWord}`; gameOver = true; }, 500); }
+    else { currentRow++; currentGuess=''; }
+  }
+
+  function checkGuess(guess){
+    const result = Array(5).fill('absent');
+    const targetLetters = targetWord.split('');
+    const guessLetters = guess.split('');
+    for (let i=0;i<5;i++){ if (guessLetters[i]===targetLetters[i]){ result[i]='correct'; targetLetters[i]=null; } }
+    for (let i=0;i<5;i++){ if (result[i] === 'absent' && targetLetters.includes(guessLetters[i])){ result[i]='present'; targetLetters[targetLetters.indexOf(guessLetters[i])] = null; } }
+    return result;
+  }
+
+  function updateKeyboard(guess,result){
+    for (let i=0;i<5;i++){ const letter = guess[i]; const state = result[i]; if (!keyStates[letter] || (keyStates[letter]==='absent' && state!=='absent') || (keyStates[letter]==='present' && state==='correct')){ keyStates[letter]=state; } }
+    createKeyboard();
+  }
+
+  // wire buttons and keyboard events
+  closeBtn.addEventListener('click', closeWordleGame);
+  resetBtn.addEventListener('click', initGame);
+  document.addEventListener('keydown', (e)=>{ if (modal.classList.contains('hidden')) return; const k = e.key.toUpperCase(); if (k==='ENTER') handleKey('ENTER'); else if (k==='BACKSPACE') handleKey('BACK'); else if (/^[A-Z]$/.test(k)) handleKey(k); });
+
+  // expose openWordleGame globally for hotspot handler
+  window.openWordleGame = openWordleGame;
 });
 
