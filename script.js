@@ -361,12 +361,12 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   enterBtn.addEventListener('click', () => {
-    // const val = (passwordInput.value || '').trim();
-    // if (val === SECRET_PASSWORD) {
+    const val = (passwordInput.value || '').trim();
+    if (val === SECRET_PASSWORD) {
       accept();
-    // } else {
-    //   showError('Incorrect password');
-    // }
+    } else {
+      showError('Incorrect password');
+    }
   });
 
   passwordInput.addEventListener('keydown', (e) => {
