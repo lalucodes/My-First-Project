@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Website</title>
+  <link rel="stylesheet" href="style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+</head>
+<body class="modal-open">
+
+  <div id="welcome-modal">
+    <div class="modal-content">
+      <h2>Welcome to Lalu's Bookshop!</h2>
+      <p>Please enter the secret password.</p>
+      <label for="Narnia" class="sr-only">Secret password</label>
+      <input id="Narnia" type="password" placeholder="Secret password" autocomplete="off">
+      <div id="password-error" class="password-error" aria-live="polite"></div>
+      <div class="modal-actions">
+        <button id="enter-btn">Enter</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="content">
+    <div id="bookshop">
+      <img id="avatar" src="images/avatar.png" alt="avatar">
+      <img id="avatar2" src="images/avatar1.png" alt="avatar2">
+      <div class="bubble npc-bubble" id="bubble-avatar"></div>
+      <div class="bubble npc-bubble" id="bubble-avatar2"></div>
+    </div>
+    
+    <!-- Wordle Modal (opened from hotspot obj4) -->
+    <div id="wordle-modal" class="hidden">
+      <div id="wordle-container">
+        <div id="wordle-title">LOZ'S SECRET WORDLE</div>
+        <div id="wordle-message"></div>
+        <div id="wordle-grid"></div>
+        <div id="wordle-keyboard"></div>
+        <div style="margin-top:12px;">
+          <button id="reset-wordle" class="reset-btn">New Game</button>
+          <button id="close-wordle" class="close-btn">Close</button>
+        </div>
+      </div>
+    </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
