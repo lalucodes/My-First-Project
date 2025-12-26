@@ -99,14 +99,14 @@ document.addEventListener('DOMContentLoaded', () => {
     "Lovely day for a read!",
     "Currently reading 'My Brilliant Friend'",
     "Can't wait to start my DPhil!",
-    "I recommend the mystery shelf."
+    "Few days until I see my mans!"
   ];
 
   const dialoguesB = [
     "Quiet please — I've got a biography to read.",
     "I'm definitely punching!",
-    "This aisle has rare editions.",
-    "Grab a tea and enjoy the book." 
+    "Reading 'The Man in the High Castle' — so good!",
+    "Missing my girlfriend back home." 
   ];
 
   let idxA = 0;
